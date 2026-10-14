@@ -1,0 +1,56 @@
+name: Daily EP scan and Pages
+on:
+  schedule:
+    # 20:30 IST, after the Kell dashboard's 20:00 refresh.
+    - cron: '0 15 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      refresh_data:
+        description: Refresh prices and catalyst feeds
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+    paths: ['pipeline/**', 'tests/**', 'web/index.html', '.github/workflows/**']
+permissions:
+  contents: write
+concurrency:
+  group: daily-ep
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Checkout validated universe and OHLCV
+        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
+        uses: actions/checkout@v6
+        with:
+          repository: arjunbchavan1989-AB/nse-kell-price-cycle
+          path: .upstream
+          sparse-checkout: web/data
+      - name: Run scanner and catalyst collection
+        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
+        run: python pipeline/run.py --upstream-dir .upstream/web/data
+      - name: Commit validated scan
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add web/data pipeline/news_archive.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update EP scan and dated catalyst evidence [skip ci]'
+            git push
+          fi
+      - name: Deploy dashboard
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: web
+          publish_branch: gh-pages
+          force_orphan: true
