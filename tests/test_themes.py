@@ -33,3 +33,17 @@ class StoryTests(unittest.TestCase):
     def test_sector_headline_alone_not_valid(self):
         r=row();r["symbol"]="TEST";r["catalyst"]["sources"]=[{"title":"TEST wins a defence order","official":False,"summary":"","candidate":True,"publisher":"CNBC TV18","published_at":"2026-10-12T15:00:00+05:30"}]
         apply_themes([r],"2026-10-12");self.assertFalse(r["story_valid"]);self.assertEqual(r["stories"][0]["status"],"Narrative candidate, unverified")
+
+    def test_invalidation_persists_after_headline_window(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state=Path(tmp)/"state.json";r=row()
+            r["catalyst"]["sources"]=[{"title":"Goodluck restructuring withdrawn","official":True,"summary":"","candidate":False,"publisher":"NSE","published_at":"2026-10-12T15:00:00+05:30"}]
+            apply_themes([r],"2026-10-12",state_path=state)
+            later=row();apply_themes([later],"2026-10-13",state_path=state)
+            self.assertFalse(later["story_valid"])
+
+    def test_future_invalidation_does_not_leak_backward(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state=Path(tmp)/"state.json";state.write_text(json.dumps({"GOODLUCK":{"invalidated_at":"2026-10-13T15:30:00+05:30"}}))
+            r=row();apply_themes([r],"2026-10-12",state_path=state)
+            self.assertTrue(r["story_valid"])

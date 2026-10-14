@@ -14,3 +14,15 @@
 - Desktop ≥1440 and mobile 390, light/dark, horizontal table containment, no page/dialog overflow, missing snapshot/chart errors.
 - Deployment: complete successful GitHub refresh, Pages built, current index/JSON reachable, live primary flow checked, separate preview deployed.
 - Latest request: separate Valid Theme / Story EP view, verified exposure/primary evidence/corroboration, no loose theme labels; expiry, future dates, cancellation, headline-only and tape-failure exclusions.
+
+## Local verification
+
+35 regression tests passed across technical threshold boundaries, pre-event-only neglect, source windows, wrong-company/routine/speculative/repost exclusions, last-good publication guards, reviewed story exposure, expiry, cancellation persistence, and future-invalidation leakage.
+
+Chromium checks at 1440×900 and 390×844 passed. The initial price scan includes 849/849 source stocks, all 70 ≥4% movers, three strict technical EP candidates, twelve volume-led candidates, and one reviewed Story EP. Catalyst counts can vary with changing RSS availability; they are not fabricated or forced to match the price moves.
+
+Full mover clipboard exactly matched the complete sorted 70-symbol list. Strict EP clipboard contained GALLANTT, SEPC and SYNGENE. Story EP clipboard contained only GOODLUCK. Symbol search, no-result disabling, all sort modes, catalyst/neglect filtering, cards/table round trip, CSV download and snapshot switching were exercised.
+
+Detail tests covered 60/120/180 bars, hover OHLCV, single-symbol copy, gates, neglect breakdown, reviewed primary filing and two corroborating sources, conditional merger caveats, rules/data-health dialogs, Escape and close. Missing snapshot/chart responses showed honest fallbacks. No JavaScript page errors were observed.
+
+Desktop light/dark and mobile story/detail screens were visually inspected. Mobile page width equals viewport width; detail dialog content fits its container; wide tables scroll inside their wrapper. Story opening-gap gate is explicitly optional rather than shown as a failed validity condition.

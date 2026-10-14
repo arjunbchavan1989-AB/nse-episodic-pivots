@@ -15,10 +15,12 @@ CATALOG=[
 REPUTABLE=("economic times","cnbc","mint","business standard","business-standard","reuters","bloomberg","moneycontrol","financial express")
 
 
-def apply_themes(rows,session,review_path=None):
+def apply_themes(rows,session,review_path=None,state_path=None):
     end=datetime.fromisoformat(session).replace(hour=15,minute=30,tzinfo=IST)
     path=Path(review_path) if review_path else Path(__file__).with_name("story_reviews.json")
     reviewed=json.loads(path.read_text()) if path.exists() else []
+    state_file=Path(state_path) if state_path else None
+    state=json.loads(state_file.read_text()) if state_file and state_file.exists() else {}
     active=[]
     for review in reviewed:
         available=datetime.fromisoformat(review["evidence_available_at"])
@@ -29,8 +31,11 @@ def apply_themes(rows,session,review_path=None):
         sources=row["catalyst"]["sources"]
         stories=[]
         invalidation=any(re.search(r"\b(cancel|cancelled|withdraw|withdrawn|abandon|abandoned|terminated|rejected)\b",s["title"].lower()) for s in sources)
+        if invalidation and (row["symbol"] not in state or end>=datetime.fromisoformat(state[row["symbol"]]["invalidated_at"])):
+            state[row["symbol"]]={"invalidated_at":end.isoformat(),"reason":"Cancellation/withdrawal evidence in collected company news; manual revalidation required"}
         for review in active:
             if review["symbol"]!=row["symbol"] or invalidation:continue
+            if row["symbol"] in state and datetime.fromisoformat(review["evidence_available_at"])<=datetime.fromisoformat(state[row["symbol"]]["invalidated_at"])<=end:continue
             stories.append({"name":review["name"],"status":"Reviewed primary evidence","valid":True,
                             "thesis":review["thesis"],"risks":review["risks"],"sources":review["sources"],
                             "evidence_available_at":review["evidence_available_at"],"reviewed_at":review["reviewed_at"],
@@ -48,7 +53,8 @@ def apply_themes(rows,session,review_path=None):
         if not invalidation:
             for name,pattern in CATALOG:
                 matched=[s for s in sources if re.search(pattern,s["title"]+" "+s.get("summary",""),re.I) and s.get("candidate")]
-                primary=[s for s in matched if s["official"]]
+                # Company names alone do not prove business exposure to a theme.
+                primary=[s for s in matched if s["official"] and re.search(pattern,re.sub(re.escape(row.get("company",row["symbol"])),"",s.get("summary",""),flags=re.I),re.I)]
                 media=[s for s in matched if not s["official"] and any(p in s["publisher"].lower() for p in REPUTABLE)]
                 publishers={s["publisher"].lower() for s in media}
                 if not matched:continue
@@ -66,4 +72,5 @@ def apply_themes(rows,session,review_path=None):
         row["story_valid"]=valid
         row["story_ep"]=bool(valid and tape)
         row["story_label"]=next((s["name"] for s in stories if s["valid"]),stories[0]["name"] if stories else "No validated story")
+    if state_file:state_file.write_text(json.dumps(state,ensure_ascii=False))
     return [{"symbol":r["symbol"],"name":s["name"],"status":s["status"]} for r in rows for s in r["stories"] if s["valid"]]

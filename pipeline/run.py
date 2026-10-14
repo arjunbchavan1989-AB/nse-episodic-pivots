@@ -50,7 +50,7 @@ def scan(upstream,allow_historical=False):
     previous_session=previous_sessions.pop()
     LOG.info("Price scan: %s stocks; %s movers; %s strict EP candidates",len(rows),sum(r["mover"] for r in rows),sum(r["ep_candidate"] for r in rows))
     diagnostics=collect(rows,names,session,previous_session,ROOT/"pipeline/news_archive.json")
-    story_watchlist=apply_themes(rows,session)
+    story_watchlist=apply_themes(rows,session,state_path=ROOT/"pipeline/story_state.json")
     rows.sort(key=lambda r:(r["change_pct"],r["rvol"]),reverse=True)
     good=sum(d["ok"] for d in diagnostics)
     payload={"title":"NSE Episodic Pivot Lab","generated_at":datetime.now(ZoneInfo("Asia/Kolkata")).isoformat(),
