@@ -76,7 +76,7 @@
 <script>
 let DATA_ROOT=['localhost','127.0.0.1'].includes(location.hostname)?'data/':'https://raw.githubusercontent.com/arjunbchavan1989-AB/nse-episodic-pivots/main/web/data/';
 async function fetchData(path,allowBundledFallback=false){
- const checked=async response=>{if(!response.ok)throw Error('Data unavailable');if(path==='latest.json'&&(await response.clone().json()).market_data?.mode!=='Independent per-repository acquisition')throw Error('Waiting for independent source data');return response;};
+ const checked=async response=>{if(!response.ok)throw Error('Data unavailable');if((path==='latest.json'||path.startsWith('snapshots/'))&&(await response.clone().json()).market_data?.mode!=='Independent per-repository acquisition')throw Error('Waiting for independent source data');return response;};
  const suffix='?v='+Math.floor(Date.now()/60000);
  try{return await checked(await fetch(DATA_ROOT+path+suffix,{cache:'no-store'}));}
  catch(error){if(!allowBundledFallback||DATA_ROOT==='data/')throw error;DATA_ROOT='data/';return await checked(await fetch(DATA_ROOT+path+suffix,{cache:'no-store'}));}

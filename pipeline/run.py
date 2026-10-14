@@ -82,7 +82,15 @@ def scan(price_inputs,allow_historical=False):
     (archives/f"{session}.json").write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")))
     files=sorted(archives.glob("*.json"),reverse=True)
     for p in files[30:]:p.unlink()
-    (data/"history.json").write_text(json.dumps([p.stem for p in files[:30]]))
+    independent=[]
+    for path in files[:30]:
+        try:
+            archived=json.loads(path.read_text())
+            if archived.get("market_data",{}).get("mode")=="Independent per-repository acquisition":
+                independent.append(path.stem)
+        except (OSError,ValueError):
+            LOG.warning("Ignoring malformed archived snapshot: %s",path.name)
+    (data/"history.json").write_text(json.dumps(independent))
     shutil.rmtree(staging)
     LOG.info("Published snapshot %s: %s stocks, %s/%s news fetches",session,len(rows),good,len(diagnostics))
     return payload
