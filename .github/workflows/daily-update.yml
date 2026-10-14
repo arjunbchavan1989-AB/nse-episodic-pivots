@@ -1,8 +1,8 @@
 name: Daily EP scan and Pages
 on:
   schedule:
-    # 20:30 IST, after the Kell dashboard's 20:00 refresh.
-    - cron: '0 15 * * 1-5'
+    # 19:30 IST; wait for the same evening's validated Kell batch.
+    - cron: '0 14 * * 1-5'
   workflow_dispatch:
     inputs:
       refresh_data:
@@ -20,7 +20,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -35,6 +35,9 @@ jobs:
           repository: arjunbchavan1989-AB/nse-kell-price-cycle
           path: .upstream
           sparse-checkout: web/data
+      - name: Wait for this evening's validated Kell batch
+        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
+        run: python pipeline/wait_upstream.py --checkout .upstream --timeout-minutes 150
       - name: Run scanner and catalyst collection
         if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
         run: python pipeline/run.py --upstream-dir .upstream/web/data

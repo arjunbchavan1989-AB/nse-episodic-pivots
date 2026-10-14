@@ -54,6 +54,7 @@ def scan(upstream,allow_historical=False):
     rows.sort(key=lambda r:(r["change_pct"],r["rvol"]),reverse=True)
     good=sum(d["ok"] for d in diagnostics)
     payload={"title":"NSE Episodic Pivot Lab","generated_at":datetime.now(ZoneInfo("Asia/Kolkata")).isoformat(),
+             "refresh_batch":source.get("refresh_batch"),
              "last_trading_date":session,"previous_session":previous_session,"config":CONFIG,"filters":filters,
              "upstream_repo":UPSTREAM_REPO,"upstream_generated_at":source["generated_at"],
              "universe_count":len(source["rows"]),"scanned_count":len(rows),"coverage_pct":round(coverage,2),

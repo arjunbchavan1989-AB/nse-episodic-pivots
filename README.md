@@ -66,7 +66,12 @@ Automatic themes cover defence/aerospace, AI/data-centres, semiconductors/electr
 
 ## Daily GitHub deployment
 
-Schedule: Monday–Friday at **20:30 IST (15:00 UTC)**, after the upstream Kell scan's 20:00 IST refresh. GitHub cron runs can be delayed. Public repositories need no paid API key for these feeds. All pipeline code uses Python's standard library.
+Schedule: Monday–Friday at **19:30 IST (14:00 UTC)**, matching Stage and Kell. The EP job waits for this evening's freshly generated Kell batch in public GitHub `main` before reading prices/charts, so simultaneous schedules cannot silently consume yesterday's data. The sequence is Stage → Kell → EP. GitHub cron can be delayed; 19:30 is a scheduled start, not a guaranteed completion time. Public repositories need no paid API key or cross-repository dispatch secret. EP pipeline code uses Python's standard library.
+
+If Kell does not publish the matching batch within 150 minutes, EP fails visibly
+and keeps the previous validated live snapshot. Weekends/holidays do not create
+artificial daily bars. Manually refresh Stage first, then start the downstream
+jobs (which may wait while upstream jobs finish).
 
 Workflow steps: regression tests; sparse checkout of the upstream validated data; price/neglect computation; dated news collection; commit the validated JSON and news archive; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
 
