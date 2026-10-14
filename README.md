@@ -70,6 +70,12 @@ Schedule: **every day at 19:30 IST (14:00 UTC)**. EP now independently refreshes
 
 Prices and own daily shares are validated before all four universe filters are applied. The latest EOD must agree with a dated NSE index archive. RS uses the exact Nifty MidSmallcap 400 against EP's independently downloaded prices. Only this repository's caches are used. Weekends/holidays do not create artificial daily bars. Manually run this workflow directly; no other dashboard needs to be run first.
 
+Preview/pplx app versions read EP's own public GitHub Pages snapshots, history
+and charts so future daily updates appear there as well. If the initial remote
+snapshot fetch fails, the bundled last-good data set is selected consistently.
+Source/EOD timestamps remain visible, and charts older than their selected
+snapshot are rejected rather than displayed as current.
+
 Workflow steps: dependency installation; regression tests; own NSE universe/price/share acquisition; price/neglect computation; dated news collection; commit validated JSON/news/benchmark data; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
 
 Filter drift, duplicate/empty universes, future/incomplete dates, snapshots older than four calendar days, or <95% same-session chart coverage fail without committing/deploying partial output. Provider histories must cover at least 65% of official listings, at least 95% of retrieved histories must match the verified EOD, and own shares must cover at least 95% of liquidity-qualified stocks. Unavailable symbols and listings with fewer than 21 positive-volume bars are explicitly reported in data-health diagnostics; this is not an exhaustive market-cap census. A valid zero-candidate EP day is published honestly. News outages do not fabricate evidence: price results publish with “Partial news availability,” explicit diagnostics and conservative/unverified ratings.
