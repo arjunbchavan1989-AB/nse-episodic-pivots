@@ -5,6 +5,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from engine import metrics,CONFIG
 from catalysts import collect
+from themes import apply_themes
 
 ROOT=Path(__file__).resolve().parents[1]
 WEB=ROOT/"web"
@@ -49,18 +50,20 @@ def scan(upstream,allow_historical=False):
     previous_session=previous_sessions.pop()
     LOG.info("Price scan: %s stocks; %s movers; %s strict EP candidates",len(rows),sum(r["mover"] for r in rows),sum(r["ep_candidate"] for r in rows))
     diagnostics=collect(rows,names,session,previous_session,ROOT/"pipeline/news_archive.json")
+    story_watchlist=apply_themes(rows,session)
     rows.sort(key=lambda r:(r["change_pct"],r["rvol"]),reverse=True)
     good=sum(d["ok"] for d in diagnostics)
     payload={"title":"NSE Episodic Pivot Lab","generated_at":datetime.now(ZoneInfo("Asia/Kolkata")).isoformat(),
              "last_trading_date":session,"previous_session":previous_session,"config":CONFIG,"filters":filters,
              "upstream_repo":UPSTREAM_REPO,"upstream_generated_at":source["generated_at"],
              "universe_count":len(source["rows"]),"scanned_count":len(rows),"coverage_pct":round(coverage,2),
-             "missing":missing,"rows":rows,"news_status":"Complete fetch" if good==len(diagnostics) else "Partial news availability",
+             "missing":missing,"rows":rows,"story_watchlist":story_watchlist,"news_status":"Complete fetch" if good==len(diagnostics) else "Partial news availability",
              "news_diagnostics":diagnostics,"news_fetches_ok":good,"news_fetches_total":len(diagnostics),
              "counts":{"movers":sum(r["mover"] for r in rows),"ep":sum(r["ep_candidate"] for r in rows),
                        "technical":sum(r["technical_pass"] for r in rows),"volume_led":sum(r["volume_led"] for r in rows),
                        "rated":sum(r["catalyst"]["strength"] is not None for r in rows),
-                       "primary":sum(r["catalyst"].get("status")=="Exchange-reported event" for r in rows)},
+                       "primary":sum(r["catalyst"].get("status") in ("Exchange-reported event","Primary filing reviewed") for r in rows),
+                       "story":sum(r["story_ep"] for r in rows),"story_valid":sum(r["story_valid"] for r in rows)},
              "method_note":"EOD price/volume neglect proxy. Analyst coverage and institutional neglect are not measured. Catalyst ratings are conservative, provisional evidence scores, not probabilities or proof of causation.",
              "price_basis":"User's daily adjusted OHLCV artifact; raw upstream close displayed. Corporate actions and extreme volumes require checking."}
     # Valid empty EP sets are published; never fabricate qualifying signals.

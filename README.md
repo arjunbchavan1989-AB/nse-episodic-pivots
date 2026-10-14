@@ -50,6 +50,20 @@ Summary ratings select economic event candidates; routine or corporate-action-on
 
 A readable source link and publication time accompany each collected item. Google News headline links are aggregator links; paywalls or redirects may apply. Original article bodies and earnings documents are not automatically read, so media headline candidates need manual verification. The news archive stores excerpts, not full commercial articles.
 
+## Valid Theme / Story EP
+
+This is a separate narrative EP bucket, not the automatic attachment of a fashionable sector label. Require verified company exposure and either reviewed primary evidence with dated corroborating reporting, or a company-matched positive primary theme disclosure plus at least two reputable media publishers addressing the same theme. Headline-only stories remain candidates, not valid story EPs.
+
+Price confirmation requires a ≥4% up-day, RVOL >3×, close position ≥65%, close ≥open and neglect passed. An opening gap is optional in this separate category; strict gap EP rules remain unchanged. Reviewed stories expire after 30 days and cancellation/withdrawal flags suppress validation. A story can remain evidence-qualified while failing today's tape conditions; that is not a new Story EP.
+
+The initial reviewed example is GOODLUCK's defence/green-energy restructuring, supported by its [12 October primary filing](https://nsearchives.nseindia.com/corporate/GOODLUCK_12102026125629_BM_outcome_12102026.pdf), [CNBC TV18 reporting](https://www.cnbctv18.com/market/goodluck-india-shares-jump-19-pc-from-days-low-heres-what-triggered-the-rally-20009881.htm), and [The Economic Times](https://economictimes.com/markets/stocks/news/goodluck-india-shares-surge-17-as-merger-expands-defence-arm-to-join-firm-along-with-green-energy-unit/articleshow/134888841.cms). The board gave in-principle approval to enlarge the proposed restructuring scope; amalgamation is not completed and financial terms remain unresolved. The filing establishes the named subsidiary exposure, not guaranteed profit accretion.
+
+The conservative “available by” timestamp on the initial primary source uses the corroborating CNBC publication time, not an invented exact exchange broadcast timestamp. All evidence was available before that session's close, although the review was performed retrospectively on 14 October. It is not a backtest.
+
+Automatic themes cover defence/aerospace, AI/data-centres, semiconductors/electronics, renewables, railways/infrastructure, sugar/ethanol and pharma/regulatory opportunity. These are matching taxonomies, not claims that each theme is presently valid. `pipeline/story_reviews.json` holds reviewed evidence and expiry windows; `pipeline/themes.py` validates it daily. New automatic feed-qualified themes and reviewed full-document stories are labelled separately. No ongoing manual human research or future curated reviews are promised by the scheduled script.
+
+“Valid” means the evidence/exposure test passes, not that an event caused the move, is economically material, or will produce a profitable trade. The detail view shows thesis, conditional risks, source quality and links. Media novelty and financial materiality still require investigation.
+
 ## Daily GitHub deployment
 
 Schedule: Monday–Friday at **20:30 IST (15:00 UTC)**, after the upstream Kell scan's 20:00 IST refresh. GitHub cron runs can be delayed. Public repositories need no paid API key for these feeds. All pipeline code uses Python's standard library.

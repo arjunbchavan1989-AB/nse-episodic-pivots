@@ -1,0 +1,61 @@
+[
+  {
+    "symbol": "GOODLUCK",
+    "name": "Defence / green-energy restructuring",
+    "evidence_available_at": "2026-10-12T15:16:00+05:30",
+    "reviewed_at": "2026-10-14",
+    "valid_days": 30,
+    "thesis": "Board-approved in-principle expansion of the proposed restructuring to include the defence/aerospace subsidiary alongside the green-energy subsidiary.",
+    "risks": [
+      "The amalgamation is proposed, not completed; valuations, detailed terms, financial implications and further approvals remain unresolved.",
+      "Evidence supports company exposure and an actual board decision, not assured earnings accretion or a profitable trade.",
+      "Intraday disclosure: this is a narrative/volume-led EP, not an opening-gap catalyst.",
+      "Reviewed retrospectively using sources available before that session's close; not a backtest."
+    ],
+    "sources": [
+      {
+        "title": "Goodluck India: board outcome expands proposed restructuring to defence/aerospace and green energy",
+        "summary": "The primary filing records in-principle approval to include Goodluck Defence and Aerospace Limited, a material subsidiary, alongside Goodluck Green Energy Limited. Detailed terms and financial implications are to be evaluated and disclosed later.",
+        "url": "https://nsearchives.nseindia.com/corporate/GOODLUCK_12102026125629_BM_outcome_12102026.pdf",
+        "published_at": "2026-10-12T14:51:00+05:30",
+        "time_basis": "Conservatively available by the CNBC report; not the exact exchange broadcast timestamp",
+        "publisher": "NSE primary filing",
+        "official": true,
+        "category": "M&A / restructuring",
+        "candidate": true,
+        "timing": "During session",
+        "strength": 3,
+        "evidence_level": "Primary filing read and reviewed",
+        "rating_reasons": ["In-principle proposal approval; implementation and materiality remain conditional."]
+      },
+      {
+        "title": "Goodluck India board approves expanded restructuring including defence and aerospace",
+        "summary": "CNBC TV18 reports the in-principle restructuring approval and named subsidiary exposure; the merger is not completed.",
+        "url": "https://www.cnbctv18.com/market/goodluck-india-shares-jump-19-pc-from-days-low-heres-what-triggered-the-rally-20009881.htm",
+        "published_at": "2026-10-12T14:51:00+05:30",
+        "publisher": "CNBC TV18",
+        "official": false,
+        "category": "M&A / restructuring",
+        "candidate": true,
+        "timing": "During session",
+        "strength": 2,
+        "evidence_level": "Article read and reviewed",
+        "rating_reasons": ["Event corroboration, not financial materiality verification."]
+      },
+      {
+        "title": "Goodluck India: proposed defence and green-energy amalgamation reported",
+        "summary": "The Economic Times reports the expanded in-principle proposal and notes further details remain to be disclosed.",
+        "url": "https://economictimes.com/markets/stocks/news/goodluck-india-shares-surge-17-as-merger-expands-defence-arm-to-join-firm-along-with-green-energy-unit/articleshow/134888841.cms",
+        "published_at": "2026-10-12T15:16:00+05:30",
+        "publisher": "The Economic Times",
+        "official": false,
+        "category": "M&A / restructuring",
+        "candidate": true,
+        "timing": "During session",
+        "strength": 2,
+        "evidence_level": "Article read and reviewed",
+        "rating_reasons": ["Proposed restructuring; no assertion of completed merger or earnings accretion."]
+      }
+    ]
+  }
+]

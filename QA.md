@@ -13,3 +13,4 @@
 - Browser: stock chart with 60/120/180 ranges, hover OHLCV, pass/fail gates, neglect breakdown, evidence links/publication times; Escape/close.
 - Desktop ≥1440 and mobile 390, light/dark, horizontal table containment, no page/dialog overflow, missing snapshot/chart errors.
 - Deployment: complete successful GitHub refresh, Pages built, current index/JSON reachable, live primary flow checked, separate preview deployed.
+- Latest request: separate Valid Theme / Story EP view, verified exposure/primary evidence/corroboration, no loose theme labels; expiry, future dates, cancellation, headline-only and tape-failure exclusions.
