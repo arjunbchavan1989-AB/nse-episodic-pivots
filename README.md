@@ -75,8 +75,9 @@ snapshots, history and charts via GitHub Raw, with minute-level cache keys.
 Current snapshots must carry independent-acquisition provenance. If the initial
 remote fetch fails, a verified independent bundled last-good data set is selected
 consistently. Source/EOD timestamps remain visible, and charts older than their
-selected snapshot are rejected rather than displayed as current. Saved historical
-snapshots preserve their original provenance and are not used as current inputs.
+selected snapshot are rejected rather than displayed as current. Only independently
+generated snapshots appear in the history selector. Older legacy files remain
+repository audit records, not inputs or selectable dashboard data.
 
 Workflow steps: dependency installation; regression tests; own NSE universe/price/share acquisition; price/neglect computation; dated news collection; commit validated JSON/news/benchmark data; configure/upload/deploy the validated `web/` artifact through GitHub's native Pages actions. Settings → Pages must use **GitHub Actions** as its build source (already configured for the live repository). Deployment is verified inside the daily workflow; it no longer relies on a separate legacy branch-build job.
 

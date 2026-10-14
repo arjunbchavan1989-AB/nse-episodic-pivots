@@ -70,6 +70,8 @@ jobs:
       - name: Deploy and verify the public dashboard
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000
       - name: Attach scan diagnostics
         if: always()
         uses: actions/upload-artifact@v5
