@@ -26,3 +26,9 @@ Full mover clipboard exactly matched the complete sorted 70-symbol list. Strict 
 Detail tests covered 60/120/180 bars, hover OHLCV, single-symbol copy, gates, neglect breakdown, reviewed primary filing and two corroborating sources, conditional merger caveats, rules/data-health dialogs, Escape and close. Missing snapshot/chart responses showed honest fallbacks. No JavaScript page errors were observed.
 
 Desktop light/dark and mobile story/detail screens were visually inspected. Mobile page width equals viewport width; detail dialog content fits its container; wide tables scroll inside their wrapper. Story opening-gap gate is explicitly optional rather than shown as a failed validity condition.
+
+## Public deployment verification
+
+The [final full-refresh Actions run](https://github.com/arjunbchavan1989-AB/nse-episodic-pivots/actions/runs/38539600985) completed successfully, passing all 35 tests and fetching all 72 news feeds/queries successfully. It scanned 849 stocks and published the shared universe's 12 October EOD snapshot. GitHub Pages reports `built`.
+
+A live Chromium visit to [NSE Episodic Pivot Lab](https://arjunbchavan1989-ab.github.io/nse-episodic-pivots/) verified the Theme / Story EP tab, its GOODLUCK row, the exact single-symbol TradingView copy result, chart loading, three reviewed source links and no JavaScript page errors. The separate preview contains the same latest validated data.
