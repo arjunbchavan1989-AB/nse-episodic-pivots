@@ -69,7 +69,7 @@ def metrics(bars,parent):
     if available and ret60<-35: warnings.append("Deep prior drawdown: neglect may be distress, not a healthy base")
     if not available: warnings.append("Insufficient pre-event history for a complete neglect assessment")
     if parent["close"] and abs(last["c"]/parent["close"]-1)>.03:
-        warnings.append("Adjusted chart close differs from the raw upstream close")
+        warnings.append("Adjusted chart close differs from the raw input close")
     return {**{k:parent.get(k) for k in ("symbol","market_cap_cr","avg_vol_20d","avg_rvol_20d_cr","avg_range_pct_20d","rs_pct","rs_excess_pct")},
             "date":last["t"],"close":parent["close"],"open":last["o"],"high":last["h"],"low":last["l"],
             "volume":last["v"],"prior_avg_vol20":rounded(avg),"gap_pct":rounded(gap),

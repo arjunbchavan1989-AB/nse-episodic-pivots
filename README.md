@@ -8,7 +8,7 @@ The public deployment is [NSE Episodic Pivot Lab](https://arjunbchavan1989-ab.gi
 
 The source universe is the user's [NSE Price Cycle dashboard](https://arjunbchavan1989-ab.github.io/nse-kell-price-cycle/), itself based on the existing stage-analysis universe. It retains strict market cap >₹500 crore, average shares volume20 >70,000, average close×volume20 >₹3 crore, and average range20 >3%. The inherited range implementation is mean(True Range / previous close ×100), including gaps, not gap-excluding ADR.
 
-The pipeline consumes the user's already-validated adjusted OHLCV chart artifacts from the public `nse-kell-price-cycle` repository. It does not introduce another stock-price provider or resume the paused NSE-only equity migration. Latest displayed close and market cap are inherited raw figures; opening gap/candle metrics use the upstream adjusted artifact. RS is inherited against Nifty MidSmallcap 400. Corporate actions and extreme volume should be independently checked.
+The pipeline acquires its own official NSE EQ listing, Yahoo EOD OHLCV histories and daily shares outstanding, then calculates its own filtered universe and price artifacts. It is independent of every other dashboard. Displayed close and market cap use its own raw EOD prices; opening-gap and candle metrics use its own dividend-adjusted OHLCV. It computes its own RS against exact Nifty MidSmallcap 400 data from dated NSE archives. Corporate actions and extreme volumes should be independently checked. The previously paused NSE-only equity-price migration is not resumed.
 
 ## Scan rules
 
@@ -66,16 +66,13 @@ Automatic themes cover defence/aerospace, AI/data-centres, semiconductors/electr
 
 ## Daily GitHub deployment
 
-Schedule: Monday–Friday at **19:30 IST (14:00 UTC)**, matching Stage and Kell. The EP job waits for this evening's freshly generated Kell batch in public GitHub `main` before reading prices/charts, so simultaneous schedules cannot silently consume yesterday's data. The sequence is Stage → Kell → EP. GitHub cron can be delayed; 19:30 is a scheduled start, not a guaranteed completion time. Public repositories need no paid API key or cross-repository dispatch secret. EP pipeline code uses Python's standard library.
+Schedule: **every day at 19:30 IST (14:00 UTC)**. EP now independently refreshes the official NSE EQ listing, its own Yahoo EOD OHLCV and shares outstanding, and its own dated catalyst feeds. It does not read Kell or any other dashboard's prices, universe, market caps or signals, and it does not wait for another repository. GitHub cron can be delayed; 19:30 is a scheduled start, not a guaranteed completion time. No paid API key or cross-repository dispatch secret is required. Prices use pandas/numpy/yfinance; catalyst and story modules use Python's standard library.
 
-If Kell does not publish the matching batch within 150 minutes, EP fails visibly
-and keeps the previous validated live snapshot. Weekends/holidays do not create
-artificial daily bars. Manually refresh Stage first, then start the downstream
-jobs (which may wait while upstream jobs finish).
+Prices and own daily shares are validated before all four universe filters are applied. The latest EOD must agree with a dated NSE index archive. RS uses the exact Nifty MidSmallcap 400 against EP's independently downloaded prices. Only this repository's caches are used. Weekends/holidays do not create artificial daily bars. Manually run this workflow directly; no other dashboard needs to be run first.
 
-Workflow steps: regression tests; sparse checkout of the upstream validated data; price/neglect computation; dated news collection; commit the validated JSON and news archive; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
+Workflow steps: dependency installation; regression tests; own NSE universe/price/share acquisition; price/neglect computation; dated news collection; commit validated JSON/news/benchmark data; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
 
-Upstream filter drift, duplicate/empty universes, future/incomplete dates, snapshots older than four calendar days, or <95% same-session chart coverage fail without committing/deploying partial output. A valid zero-candidate EP day is published honestly. News outages do not fabricate evidence: price results publish with “Partial news availability,” explicit diagnostics and conservative/unverified ratings.
+Filter drift, duplicate/empty universes, future/incomplete dates, snapshots older than four calendar days, or <95% same-session chart coverage fail without committing/deploying partial output. Provider histories must cover at least 65% of official listings, at least 95% of retrieved histories must match the verified EOD, and own shares must cover at least 95% of liquidity-qualified stocks. Unavailable symbols and listings with fewer than 21 positive-volume bars are explicitly reported in data-health diagnostics; this is not an exhaustive market-cap census. A valid zero-candidate EP day is published honestly. News outages do not fabricate evidence: price results publish with “Partial news availability,” explicit diagnostics and conservative/unverified ratings.
 
 Run workflow manually with `refresh_data=true` to refresh everything, or `false` for a UI-only redeploy of the existing validated snapshot. Saved snapshot metrics/news are point-in-time; historical charts use current adjusted bars filtered to that date, not a separate historical-data archive. This is not a survivorship-free backtest.
 
@@ -83,7 +80,8 @@ Run workflow manually with `refresh_data=true` to refresh everything, or `false`
 
 ```bash
 python -m unittest discover -s tests -v
-python pipeline/run.py --upstream-dir ../kell-dashboard/web/data
+pip install -r pipeline/requirements.txt
+python pipeline/run.py
 ```
 
 Serve `web/` with a static HTTP server. Company aliases live in `pipeline/company_names.csv` and may need updating for renamed/newly listed companies. Thresholds are in `pipeline/engine.py`; event matching and rating rules are in `pipeline/catalysts.py`.

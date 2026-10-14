@@ -3,3 +3,4 @@ __pycache__/
 .upstream/
 .staging-data/
 .env
+pipeline/cache/

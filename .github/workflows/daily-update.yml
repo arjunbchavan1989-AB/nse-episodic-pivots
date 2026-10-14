@@ -1,8 +1,8 @@
 name: Daily EP scan and Pages
 on:
   schedule:
-    # 19:30 IST; wait for the same evening's validated Kell batch.
-    - cron: '0 14 * * 1-5'
+    # 19:30 IST. Independent acquisition; no Kell or Stage dependency.
+    - cron: '0 14 * * *'
   workflow_dispatch:
     inputs:
       refresh_data:
@@ -20,32 +20,38 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+      - uses: actions/cache/restore@v5
+        with:
+          path: pipeline/cache
+          key: ep-own-market-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: ep-own-market-${{ runner.os }}-
+      - name: Install own market-data dependencies
+        run: pip install -r pipeline/requirements.txt
       - name: Regression tests
         run: python -m unittest discover -s tests -v
-      - name: Checkout validated universe and OHLCV
+      - name: Fetch own NSE universe, EOD prices and catalysts
         if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        uses: actions/checkout@v6
+        run: |
+          set -euo pipefail
+          python pipeline/run.py 2>&1 | tee /tmp/ep-scan.log
+      - uses: actions/cache/save@v5
+        if: always() && (github.event_name != 'workflow_dispatch' || inputs.refresh_data)
         with:
-          repository: arjunbchavan1989-AB/nse-kell-price-cycle
-          path: .upstream
-          sparse-checkout: web/data
-      - name: Wait for this evening's validated Kell batch
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        run: python pipeline/wait_upstream.py --checkout .upstream --timeout-minutes 150
-      - name: Run scanner and catalyst collection
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        run: python pipeline/run.py --upstream-dir .upstream/web/data
+          path: pipeline/cache
+          key: ep-own-market-${{ runner.os }}-${{ github.run_id }}
       - name: Commit validated scan
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add web/data pipeline/news_archive.json pipeline/story_state.json
+          git add web/data pipeline/news_archive.json pipeline/story_state.json pipeline/benchmark_midsmall400.csv
           if ! git diff --cached --quiet; then
             git commit -m 'Update EP scan and dated catalyst evidence [skip ci]'
             git push
@@ -57,3 +63,10 @@ jobs:
           publish_dir: web
           publish_branch: gh-pages
           force_orphan: true
+      - name: Attach scan diagnostics
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: scan-log
+          path: /tmp/ep-scan.log
+          if-no-files-found: ignore
