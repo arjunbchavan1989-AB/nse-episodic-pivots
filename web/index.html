@@ -74,10 +74,12 @@
 <dialog id="manual-copy"><div class="dialog-head"><h2>TradingView symbols</h2><button data-close="manual-copy">Close</button></div><div class="dialog-body"><p>Clipboard access is blocked in this browser. Select and copy this text, then paste it into TradingView's Add symbols dialog.</p><textarea id="manual-text" readonly aria-label="TradingView symbol list"></textarea></div></dialog>
 <div class="toast" id="toast" role="status" hidden></div>
 <script>
-let DATA_ROOT=['localhost','127.0.0.1','arjunbchavan1989-ab.github.io'].includes(location.hostname)?'data/':'https://arjunbchavan1989-ab.github.io/nse-episodic-pivots/data/';
+let DATA_ROOT=['localhost','127.0.0.1'].includes(location.hostname)?'data/':'https://raw.githubusercontent.com/arjunbchavan1989-AB/nse-episodic-pivots/main/web/data/';
 async function fetchData(path,allowBundledFallback=false){
- try{const response=await fetch(DATA_ROOT+path,{cache:'no-store'});if(!response.ok)throw Error('Data unavailable');return response;}
- catch(error){if(!allowBundledFallback||DATA_ROOT==='data/')throw error;DATA_ROOT='data/';const response=await fetch(DATA_ROOT+path,{cache:'no-store'});if(!response.ok)throw error;return response;}
+ const checked=async response=>{if(!response.ok)throw Error('Data unavailable');if(path==='latest.json'&&(await response.clone().json()).market_data?.mode!=='Independent per-repository acquisition')throw Error('Waiting for independent source data');return response;};
+ const suffix='?v='+Math.floor(Date.now()/60000);
+ try{return await checked(await fetch(DATA_ROOT+path+suffix,{cache:'no-store'}));}
+ catch(error){if(!allowBundledFallback||DATA_ROOT==='data/')throw error;DATA_ROOT='data/';return await checked(await fetch(DATA_ROOT+path+suffix,{cache:'no-store'}));}
 }
 const $=id=>document.getElementById(id);
 let data=null,latestDate=null,view='movers',mode=innerWidth<=650?'cards':'table',filtered=[],selected=null,chartData=null,chartRange=120,chartBars=[],chartGeometry=null,chartToken=0,loadToken=0,toastTimer=null;

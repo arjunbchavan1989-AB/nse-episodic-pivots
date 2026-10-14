@@ -70,11 +70,13 @@ Schedule: **every day at 19:30 IST (14:00 UTC)**. EP now independently refreshes
 
 Prices and own daily shares are validated before all four universe filters are applied. The latest EOD must agree with a dated NSE index archive. RS uses the exact Nifty MidSmallcap 400 against EP's independently downloaded prices. Only this repository's caches are used. Weekends/holidays do not create artificial daily bars. Manually run this workflow directly; no other dashboard needs to be run first.
 
-Preview/pplx app versions read EP's own public GitHub Pages snapshots, history
-and charts so future daily updates appear there as well. If the initial remote
-snapshot fetch fails, the bundled last-good data set is selected consistently.
-Source/EOD timestamps remain visible, and charts older than their selected
-snapshot are rejected rather than displayed as current.
+GitHub Pages and preview/pplx app frontends read EP's own public `main/web/data/`
+snapshots, history and charts via GitHub Raw, with minute-level cache keys.
+Current snapshots must carry independent-acquisition provenance. If the initial
+remote fetch fails, a verified independent bundled last-good data set is selected
+consistently. Source/EOD timestamps remain visible, and charts older than their
+selected snapshot are rejected rather than displayed as current. Saved historical
+snapshots preserve their original provenance and are not used as current inputs.
 
 Workflow steps: dependency installation; regression tests; own NSE universe/price/share acquisition; price/neglect computation; dated news collection; commit validated JSON/news/benchmark data; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
 
