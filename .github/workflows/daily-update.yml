@@ -1,8 +1,8 @@
 name: Daily EP scan and Pages
 on:
   schedule:
-    # 19:30 IST. Regenerate the upstream artifact in this runner first.
-    - cron: '0 14 * * 1-5'
+    # 20:30 IST, after the Kell dashboard's 20:00 refresh.
+    - cron: '0 15 * * 1-5'
   workflow_dispatch:
     inputs:
       refresh_data:
@@ -20,7 +20,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -34,31 +34,7 @@ jobs:
         with:
           repository: arjunbchavan1989-AB/nse-kell-price-cycle
           path: .upstream
-          sparse-checkout: |
-            web/data
-            pipeline
-            tests
-      - name: Install existing upstream pipeline dependencies
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        run: pip install -r .upstream/pipeline/requirements.txt
-      - name: Restore upstream history cache
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        uses: actions/cache/restore@v5
-        with:
-          path: .upstream/pipeline/cache
-          key: ep-upstream-${{ runner.os }}-${{ github.run_id }}
-          restore-keys: ep-upstream-${{ runner.os }}-
-      - name: Validate and refresh upstream EOD artifact locally
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        run: |
-          python -m unittest discover -s .upstream/tests -v
-          python .upstream/pipeline/run.py
-      - name: Save validated upstream history cache
-        if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
-        uses: actions/cache/save@v5
-        with:
-          path: .upstream/pipeline/cache
-          key: ep-upstream-${{ runner.os }}-${{ github.run_id }}
+          sparse-checkout: web/data
       - name: Run scanner and catalyst collection
         if: github.event_name != 'workflow_dispatch' || inputs.refresh_data
         run: python pipeline/run.py --upstream-dir .upstream/web/data

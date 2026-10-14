@@ -66,13 +66,9 @@ Automatic themes cover defence/aerospace, AI/data-centres, semiconductors/electr
 
 ## Daily GitHub deployment
 
-Schedule: Monday–Friday at **19:30 IST (14:00 UTC)**. GitHub cron runs can be delayed; this is the job's start time, not a guarantee the published refresh finishes at exactly 19:30.
+Schedule: Monday–Friday at **20:30 IST (15:00 UTC)**, after the upstream Kell scan's 20:00 IST refresh. GitHub cron runs can be delayed. Public repositories need no paid API key for these feeds. All pipeline code uses Python's standard library.
 
-Because the existing Kell dashboard publishes later, this workflow installs and runs that same approved upstream pipeline locally in its own runner before computing EP results. Its cached histories and validations are reused; the underlying equity/index data sources are unchanged. The existing stage and Kell repositories and their schedules are not modified. Price/benchmark providers can publish late; an unsuccessful upstream or EP scan retains the last good public snapshot rather than pretending to have fresh data.
-
-The EP/news/theme code uses Python's standard library; local upstream regeneration installs the existing Kell pipeline's documented Python dependencies. No new paid data key is required.
-
-Workflow steps: EP regression tests; sparse checkout of the existing upstream data, pipeline and tests; upstream regression tests and local EOD regeneration; price/neglect computation; dated news collection; commit the validated JSON and news archive; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
+Workflow steps: regression tests; sparse checkout of the upstream validated data; price/neglect computation; dated news collection; commit the validated JSON and news archive; deploy `web/` to `gh-pages`. Configure repository Settings → Pages to `gh-pages`, `/ (root)`.
 
 Upstream filter drift, duplicate/empty universes, future/incomplete dates, snapshots older than four calendar days, or <95% same-session chart coverage fail without committing/deploying partial output. A valid zero-candidate EP day is published honestly. News outages do not fabricate evidence: price results publish with “Partial news availability,” explicit diagnostics and conservative/unverified ratings.
 
