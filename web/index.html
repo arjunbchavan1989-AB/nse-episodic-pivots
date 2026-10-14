@@ -100,7 +100,7 @@ function updateMeta(){
  $('built').textContent='Built '+new Date(data.generated_at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})+' IST';
  for(const k of ['movers','ep','story','volume']){$('stat-'+k).textContent=data.counts[k==='volume'?'volume_led':k];$('count-'+k).textContent=data.counts[k==='volume'?'volume_led':k]}
  $('stat-rated').textContent=data.counts.rated;$('count-all').textContent=data.scanned_count;
- $('rated-note').textContent=data.counts.primary+' exchange-reported events · others headline-only';
+ $('rated-note').textContent=data.counts.primary+' exchange-reported '+(data.counts.primary===1?'event':'events')+' · others headline-only';
  const age=(Date.now()-new Date(data.last_trading_date+'T15:30:00+05:30'))/86400000;
  const health=data.market_data;$('notice').textContent=`${data.scanned_count}/${data.universe_count} stocks scanned · ${data.coverage_pct}% eligible chart coverage · ${data.news_status}. `+(health?`Own provider histories: ${health.retrieved_count}/${health.official_listing_count} listings (${health.listing_history_coverage_pct}%). Unavailable/new histories are excluded. `:'Historical snapshot retains its original source provenance. ')+`Ratings are provisional; causality is not established.`+(age>4?' This EOD snapshot is stale; inspect this dashboard’s Actions run.':'');
  $('notice').classList.toggle('warn',age>4||data.news_fetches_ok<data.news_fetches_total);
