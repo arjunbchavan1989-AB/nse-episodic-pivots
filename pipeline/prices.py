@@ -17,6 +17,7 @@ def safe(value):
 def prepare():
     source,frames=build()
     benchmark=load_benchmark(source["last_trading_date"])
+    source["previous_trading_date"]=str(benchmark.index[-2].date())
     chart_dir=OUTPUT/"charts";chart_dir.mkdir(parents=True,exist_ok=True)
     for row in source["rows"]:
         symbol=row["symbol"];raw=frames[symbol].rename(columns=str.lower);technical=raw.copy()

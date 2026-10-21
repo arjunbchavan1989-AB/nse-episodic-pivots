@@ -12,6 +12,17 @@ WEB=ROOT/"web"
 LOG=logging.getLogger("ep")
 PRICE_SOURCE="Independent acquisition: official NSE listing, Yahoo EOD prices and shares"
 
+def align_previous_session(rows,charts,expected,total):
+    """Never treat a stock's last available bar as the exchange's prior session."""
+    if not expected:raise RuntimeError("Previous exchange session is not verified")
+    rejected=[{"symbol":r["symbol"],"error":f"Missing verified previous NSE session {expected}"}
+              for r in rows if len(charts[r["symbol"]]["bars"])<2 or charts[r["symbol"]]["bars"][-2]["t"]!=expected]
+    bad={r["symbol"] for r in rejected}
+    kept=[r for r in rows if r["symbol"] not in bad]
+    coverage=len(kept)/total*100 if total else 0
+    if coverage<95:raise RuntimeError(f"Previous-session chart coverage below 95% ({coverage:.1f}%), preserving last good output")
+    return kept,{s:c for s,c in charts.items() if s not in bad},rejected,coverage
+
 
 def scan(price_inputs,allow_historical=False):
     price_inputs=Path(price_inputs)
@@ -44,10 +55,17 @@ def scan(price_inputs,allow_historical=False):
             missing.append({"symbol":parent["symbol"],"error":str(e)})
     coverage=len(rows)/len(source["rows"])*100
     if coverage<95:raise RuntimeError(f"Chart coverage below 95% ({coverage:.1f}%), preserving last good output")
-    # Every stock must share one date; every prior-day news window uses actual bars.
-    previous_sessions={chart["bars"][-2]["t"] for chart in charts.values()}
-    if len(previous_sessions)!=1:raise RuntimeError("Previous trading sessions do not match")
-    previous_session=previous_sessions.pop()
+    # Use this repository's independently verified exchange calendar, not a vote
+    # among stock histories or an older available bar for a suspended symbol.
+    previous_session=source.get("previous_trading_date")
+    if not previous_session:
+        with (ROOT/"pipeline/benchmark_midsmall400.csv").open() as f:
+            dates=sorted({r["date"] for r in csv.DictReader(f) if r["date"]<session})
+        previous_session=dates[-1] if dates else None
+    if previous_session and previous_session>=session:raise RuntimeError("Previous exchange session is invalid")
+    rows,charts,prior_missing,coverage=align_previous_session(rows,charts,previous_session,len(source["rows"]))
+    missing.extend(prior_missing)
+    if prior_missing:LOG.warning("Excluded %s histories missing verified prior session %s; remaining coverage %.2f%%",len(prior_missing),previous_session,coverage)
     LOG.info("Price scan: %s stocks; %s movers; %s strict EP candidates",len(rows),sum(r["mover"] for r in rows),sum(r["ep_candidate"] for r in rows))
     diagnostics=collect(rows,names,session,previous_session,ROOT/"pipeline/news_archive.json")
     story_watchlist=apply_themes(rows,session,state_path=ROOT/"pipeline/story_state.json")
